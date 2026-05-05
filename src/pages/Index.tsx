@@ -47,9 +47,15 @@ const Index = () => {
           }
         }
 
+        // Função para converter data DD/MM/AAAA para objeto Date
+        const parseDate = (dateString: string): Date => {
+          const [dia, mes, ano] = dateString.split('/');
+          return new Date(`${ano}-${mes}-${dia}`);
+        };
+
         // Calcular dias restantes e categorizar
         const atividadesComDias = atividadesData.map(atividade => {
-          const dataEntrega = new Date(atividade.dataEntrega);
+          const dataEntrega = parseDate(atividade.dataEntrega);
           const hoje = new Date();
           const diffTime = dataEntrega.getTime() - hoje.getTime();
           const diasRestantes = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -181,7 +187,7 @@ const Index = () => {
                         </div>
                         <div className="flex items-center text-gray-300">
                           <span className="mr-1">📅</span>
-                          <span>{new Date(atividade.dataEntrega).toLocaleDateString('pt-BR')}</span>
+                          <span>{atividade.dataEntrega}</span>
                         </div>
                         <div className="flex items-center text-red-400 font-medium">
                           <span className="mr-1">⏳</span>
@@ -223,7 +229,7 @@ const Index = () => {
                         </div>
                         <div className="flex items-center text-gray-300">
                           <span className="mr-1">📅</span>
-                          <span>{new Date(atividade.dataEntrega).toLocaleDateString('pt-BR')}</span>
+                          <span>{atividade.dataEntrega}</span>
                         </div>
                         <div className="flex items-center text-yellow-400 font-medium">
                           <span className="mr-1">⏳</span>
@@ -265,7 +271,7 @@ const Index = () => {
                         </div>
                         <div className="flex items-center text-gray-300">
                           <span className="mr-1">📅</span>
-                          <span>{new Date(atividade.dataEntrega).toLocaleDateString('pt-BR')}</span>
+                          <span>{atividade.dataEntrega}</span>
                         </div>
                         <div className="flex items-center text-green-400 font-medium">
                           <span className="mr-1">⏳</span>
