@@ -1,13 +1,301 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dyad-generated-app</title>
-  </head>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Prazos Acadêmicos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#111827',
+                        foreground: '#f3f4f6',
+                        card: '#1f2937',
+                        'card-foreground': '#f3f4f6',
+                        border: '#374151',
+                        input: '#374151',
+                        ring: '#6366f1',
+                        primary: {
+                            DEFAULT: '#6366f1',
+                            foreground: '#ffffff'
+                        },
+                        secondary: {
+                            DEFAULT: '#4b5563',
+                            foreground: '#f3f4f6'
+                        },
+                        destructive: {
+                            DEFAULT: '#ef4444',
+                            foreground: '#ffffff'
+                        },
+                        muted: {
+                            DEFAULT: '#4b5563',
+                            foreground: '#9ca3af'
+                        },
+                        accent: {
+                            DEFAULT: '#4b5563',
+                            foreground: '#f3f4f6'
+                        },
+                        popover: {
+                            DEFAULT: '#1f2937',
+                            foreground: '#f3f4f6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Cabeçalho -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-white mb-2">📌 PAINEL DE PRAZOS</h1>
+            <p class="text-gray-400" id="dataAtual">Carregando...</p>
+        </div>
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+        <!-- Loading -->
+        <div id="loading" class="min-h-screen flex items-center justify-center">
+            <div class="text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                <p class="text-gray-400">Carregando atividades...</p>
+            </div>
+        </div>
+
+        <!-- Erro -->
+        <div id="error" class="hidden min-h-screen flex items-center justify-center">
+            <div class="text-center max-w-md">
+                <div class="text-6xl mb-4">⚠️</div>
+                <h2 class="text-2xl font-semibold text-white mb-2">Erro ao carregar</h2>
+                <p class="text-gray-400 mb-4" id="errorMessage">Não foi possível carregar as atividades.</p>
+                <button onclick="location.reload()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors">
+                    Tentar novamente
+                </button>
+            </div>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div id="conteudo" class="hidden">
+            <!-- Seção URGENTES -->
+            <div id="secaoUrgentes" class="mb-8">
+                <div class="flex items-center mb-4">
+                    <div class="w-4 h-4 rounded-full bg-red-500 mr-3"></div>
+                    <h2 class="text-xl font-semibold text-white">URGENTES</h2>
+                    <span class="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full" id="countUrgentes">0</span>
+                </div>
+                <div id="listaUrgentes" class="space-y-4"></div>
+            </div>
+
+            <!-- Seção IMPORTANTES -->
+            <div id="secaoImportantes" class="mb-8">
+                <div class="flex items-center mb-4">
+                    <div class="w-4 h-4 rounded-full bg-yellow-500 mr-3"></div>
+                    <h2 class="text-xl font-semibold text-white">IMPORTANTES</h2>
+                    <span class="ml-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded-full" id="countImportantes">0</span>
+                </div>
+                <div id="listaImportantes" class="space-y-4"></div>
+            </div>
+
+            <!-- Seção TRANQUILOS -->
+            <div id="secaoTranquilos" class="mb-8">
+                <div class="flex items-center mb-4">
+                    <div class="w-4 h-4 rounded-full bg-green-500 mr-3"></div>
+                    <h2 class="text-xl font-semibold text-white">TRANQUILOS</h2>
+                    <span class="ml-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full" id="countTranquilos">0</span>
+                </div>
+                <div id="listaTranquilos" class="space-y-4"></div>
+            </div>
+
+            <!-- Mensagem quando não há atividades -->
+            <div id="semAtividades" class="hidden text-center py-12">
+                <div class="text-6xl mb-4">📚</div>
+                <h2 class="text-2xl font-semibold text-white mb-2">Nenhuma atividade encontrada</h2>
+                <p class="text-gray-400">Verifique a planilha Google Sheets ou adicione atividades para começar!</p>
+            </div>
+
+            <!-- Made with Dyad -->
+            <div class="p-4 text-center">
+                <a href="https://www.dyad.sh/" target="_blank" rel="noopener noreferrer" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    Made with Dyad
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Função para converter data DD/MM/AAAA para objeto Date
+        function parseDate(dateString) {
+            const [dia, mes, ano] = dateString.split('/');
+            return new Date(`${ano}-${mes}-${dia}`);
+        }
+
+        // Função para formatar data como DD/MM/AAAA
+        function formatarData(dateString) {
+            const [dia, mes, ano] = dateString.split('/');
+            return `${dia}/${mes}/${ano}`;
+        }
+
+        // Função para calcular dias restantes
+        function calcularDiasRestantes(dataEntrega) {
+            const dataEntregaObj = parseDate(dataEntrega);
+            const hoje = new Date();
+            const diffTime = dataEntregaObj.getTime() - hoje.getTime();
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+
+        // Função para determinar status
+        function getStatus(diasRestantes) {
+            if (diasRestantes <= 2) return "URGENTE";
+            if (diasRestantes <= 5) return "IMPORTANTE";
+            return "TRANQUILO";
+        }
+
+        // Função para criar card de atividade
+        function criarCardAtividade(atividade) {
+            const statusColor = {
+                "URGENTE": "border-red-500 text-red-400",
+                "IMPORTANTE": "border-yellow-500 text-yellow-400",
+                "TRANQUILO": "border-green-500 text-green-400"
+            };
+
+            return `
+                <div class="bg-gray-800 rounded-lg p-4 border-l-4 ${statusColor[atividade.status]} hover:bg-gray-750 transition-colors">
+                    <div class="flex items-start space-x-3">
+                        <div class="text-2xl">📘</div>
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-white text-lg">${atividade.titulo}</h3>
+                            <div class="flex items-center space-x-4 mt-2 text-sm">
+                                <div class="flex items-center text-gray-300">
+                                    <span class="mr-1">📚</span>
+                                    <span>${atividade.disciplina}</span>
+                                </div>
+                                <div class="flex items-center text-gray-300">
+                                    <span class="mr-1">📅</span>
+                                    <span>${formatarData(atividade.dataEntrega)}</span>
+                                </div>
+                                <div class="flex items-center ${statusColor[atividade.status]} font-medium">
+                                    <span class="mr-1">⏳</span>
+                                    <span>${atividade.diasRestantes} dias restantes</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Função principal para carregar e exibir atividades
+        async function carregarAtividades() {
+            try {
+                const response = await fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6-29uYKdWPh1KcQn6SM36wU5a44JpxTW7BXwJxO9HSYhDHxEq1QDtRdXdOEGbOz55AVznV_bjGAMF/pub?gid=404939283&single=true&output=csv");
+                
+                if (!response.ok) {
+                    throw new Error("Erro ao buscar dados da planilha");
+                }
+                
+                const csvText = await response.text();
+                const linhas = csvText.split('\n').filter(linha => linha.trim());
+                
+                // Processar dados
+                const atividadesData = [];
+                
+                for (let i = 1; i < linhas.length; i++) {
+                    const colunas = linhas[i].split(',');
+                    if (colunas.length >= 3) {
+                        atividadesData.push({
+                            titulo: colunas[0]?.trim() || '',
+                            disciplina: colunas[1]?.trim() || '',
+                            dataEntrega: colunas[2]?.trim() || ''
+                        });
+                    }
+                }
+
+                // Calcular dias restantes e categorizar
+                const atividadesComDias = atividadesData.map(atividade => {
+                    const diasRestantes = calcularDiasRestantes(atividade.dataEntrega);
+                    const status = getStatus(diasRestantes);
+                    
+                    return {
+                        ...atividade,
+                        diasRestantes,
+                        status
+                    };
+                });
+
+                // Agrupar atividades por status
+                const atividadesAgrupadas = {
+                    URGENTES: atividadesComDias.filter(a => a.status === "URGENTE"),
+                    IMPORTANTES: atividadesComDias.filter(a => a.status === "IMPORTANTE"),
+                    TRANQUILOS: atividadesComDias.filter(a => a.status === "TRANQUILO")
+                };
+
+                // Exibir atividades
+                exibirAtividades(atividadesAgrupadas);
+
+            } catch (err) {
+                console.error("Erro ao buscar atividades:", err);
+                document.getElementById('errorMessage').textContent = "Não foi possível carregar as atividades. Verifique a conexão e tente novamente.";
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error').classList.remove('hidden');
+            }
+        }
+
+        // Função para exibir atividades na interface
+        function exibirAtividades(atividadesAgrupadas) {
+            // Atualizar contadores
+            document.getElementById('countUrgentes').textContent = atividadesAgrupadas.URGENTES.length;
+            document.getElementById('countImportantes').textContent = atividadesAgrupadas.IMPORTANTES.length;
+            document.getElementById('countTranquilos').textContent = atividadesAgrupadas.TRANQUILOS.length;
+
+            // Exibir seções com atividades
+            if (atividadesAgrupadas.URGENTES.length > 0) {
+                document.getElementById('secaoUrgentes').classList.remove('hidden');
+                const listaUrgentes = document.getElementById('listaUrgentes');
+                listaUrgentes.innerHTML = atividadesAgrupadas.URGENTES.map(criarCardAtividade).join('');
+            }
+
+            if (atividadesAgrupadas.IMPORTANTES.length > 0) {
+                document.getElementById('secaoImportantes').classList.remove('hidden');
+                const listaImportantes = document.getElementById('listaImportantes');
+                listaImportantes.innerHTML = atividadesAgrupadas.IMPORTANTES.map(criarCardAtividade).join('');
+            }
+
+            if (atividadesAgrupadas.TRANQUILOS.length > 0) {
+                document.getElementById('secaoTranquilos').classList.remove('hidden');
+                const listaTranquilos = document.getElementById('listaTranquilos');
+                listaTranquilos.innerHTML = atividadesAgrupadas.TRANQUILOS.map(criarCardAtividade).join('');
+            }
+
+            // Mostrar mensagem se não houver atividades
+            if (atividadesAgrupadas.URGENTES.length === 0 && 
+                atividadesAgrupadas.IMPORTANTES.length === 0 && 
+                atividadesAgrupadas.TRANQUILOS.length === 0) {
+                document.getElementById('semAtividades').classList.remove('hidden');
+            }
+
+            // Esconder loading e mostrar conteúdo
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('conteudo').classList.remove('hidden');
+        }
+
+        // Função para formatar data atual
+        function formatarDataAtual() {
+            const hoje = new Date();
+            const dataFormatada = hoje.toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            document.getElementById('dataAtual').textContent = `Atualizado em: ${dataFormatada}`;
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            formatarDataAtual();
+            carregarAtividades();
+        });
+    </script>
+</body>
 </html>
