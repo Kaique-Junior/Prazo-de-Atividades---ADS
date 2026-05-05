@@ -181,7 +181,7 @@ const Index = () => {
                         </div>
                         <div className="flex items-center text-gray-300">
                           <span className="mr-1">📅</span>
-                          <span>{new Date(atividade.dataEntrega).toLocaleDateString('pt-BR')}</span>
+                          <span>{new Date(atividade.dataEntrega).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                         </div>
                         <div className="flex items-center text-red-400 font-medium">
                           <span className="mr-1">⏳</span>
@@ -223,7 +223,7 @@ const Index = () => {
                         </div>
                         <div className="flex items-center text-gray-300">
                           <span className="mr-1">📅</span>
-                          <span>{new Date(atividade.dataEntrega).toLocaleDateString('pt-BR')}</span>
+                          <span>{new Date(atividade.dataEntrega).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                         </div>
                         <div className="flex items-center text-yellow-400 font-medium">
                           <span className="mr-1">⏳</span>
@@ -265,7 +265,7 @@ const Index = () => {
                         </div>
                         <div className="flex items-center text-gray-300">
                           <span className="mr-1">📅</span>
-                          <span>{new Date(atividade.dataEntrega).toLocaleDateString('pt-BR')}</span>
+                          <span>{new Date(atividade.dataEntrega).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                         </div>
                         <div className="flex items-center text-green-400 font-medium">
                           <span className="mr-1">⏳</span>
