@@ -16,43 +16,17 @@
                         sans: ['Inter', 'system-ui', 'sans-serif'],
                     },
                     colors: {
-                        glass: {
-                            50: 'rgba(255, 255, 255, 0.05)',
-                            100: 'rgba(255, 255, 255, 0.1)',
-                            200: 'rgba(255, 255, 255, 0.15)',
-                            300: 'rgba(255, 255, 255, 0.2)',
-                        },
                         urgent: {
-                            50: 'rgba(239, 68, 68, 0.1)',
-                            100: 'rgba(239, 68, 68, 0.2)',
-                            500: 'rgba(239, 68, 68, 0.8)',
-                            600: 'rgba(220, 38, 38, 0.9)',
+                            500: '#dc2626',
+                            600: '#b91c1c'
                         },
                         important: {
-                            50: 'rgba(245, 158, 11, 0.1)',
-                            100: 'rgba(245, 158, 11, 0.2)',
-                            500: 'rgba(245, 158, 11, 0.8)',
-                            600: 'rgba(217, 119, 6, 0.9)',
+                            500: '#d97706',
+                            600: '#b45309'
                         },
                         calm: {
-                            50: 'rgba(34, 197, 94, 0.1)',
-                            100: 'rgba(34, 197, 94, 0.2)',
-                            500: 'rgba(34, 197, 94, 0.8)',
-                            600: 'rgba(22, 163, 74, 0.9)',
-                        }
-                    },
-                    animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'glow': 'glow 2s ease-in-out infinite alternate',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        },
-                        glow: {
-                            'from': { boxShadow: '0 0 20px rgba(99, 102, 241, 0.3)' },
-                            'to': { boxShadow: '0 0 30px rgba(99, 102, 241, 0.6)' },
+                            500: '#16a34a',
+                            600: '#15803d'
                         }
                     }
                 }
@@ -62,46 +36,75 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            background: #0a0a0a;
             min-height: 100vh;
         }
         
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .card {
+            background: #1e1e2e;
+            border: 1px solid #2a2a3e;
+            transition: all 0.2s ease;
         }
         
-        .glass-card:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            border-color: rgba(255, 255, 255, 0.2);
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border-color: #3a3a4e;
         }
         
-        .status-badge {
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .card-urgent {
+            border-left: 4px solid #dc2626;
         }
         
-        .gradient-border {
-            background: linear-gradient(45deg, #6366f1, #8b5cf6, #06b6d4);
-            padding: 1px;
-            border-radius: 12px;
+        .card-important {
+            border-left: 4px solid #d97706;
         }
         
-        .gradient-border .glass-card {
-            border-radius: 11px;
+        .card-calm {
+            border-left: 4px solid #16a34a;
+        }
+        
+        .badge-urgent {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .badge-important {
+            background: #d97706;
+            color: white;
+        }
+        
+        .badge-calm {
+            background: #16a34a;
+            color: white;
+        }
+        
+        .text-white {
+            color: #ffffff;
+        }
+        
+        .text-gray-light {
+            color: #b0b0b0;
+        }
+        
+        .text-urgent {
+            color: #dc2626;
+        }
+        
+        .text-important {
+            color: #d97706;
+        }
+        
+        .text-calm {
+            color: #16a34a;
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 text-gray-100">
+<body class="bg-black text-gray-100">
     <div class="container mx-auto px-4 py-8 max-w-7xl">
         <!-- Cabeçalho -->
         <div class="text-center mb-12">
-            <h1 class="text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent mb-4">
-                📌 Painel de Prazos
-            </h1>
+            <h1 class="text-5xl font-bold text-white mb-4">📌 Painel de Prazos</h1>
             <p class="text-gray-400 text-sm" id="dataAtual">Carregando...</p>
         </div>
 
@@ -119,7 +122,7 @@
                 <div class="text-8xl mb-6 animate-pulse">⚠️</div>
                 <h2 class="text-3xl font-semibold text-white mb-3">Erro ao carregar</h2>
                 <p class="text-gray-400 mb-6" id="errorMessage">Não foi possível carregar as atividades.</p>
-                <button onclick="location.reload()" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-all transform hover:scale-105">
+                <button onclick="location.reload()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-all">
                     <i class="fas fa-redo mr-2"></i>Tentar novamente
                 </button>
             </div>
@@ -131,10 +134,10 @@
             <div id="secaoUrgentes" class="mb-12">
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center">
-                        <div class="w-6 h-6 rounded-full bg-urgent-500 mr-4 animate-pulse"></div>
+                        <div class="w-6 h-6 rounded-full bg-urgent-500 mr-4"></div>
                         <h2 class="text-2xl font-bold text-white">URGENTES</h2>
                     </div>
-                    <span class="status-badge bg-urgent-500 text-white px-4 py-2 rounded-full text-sm font-medium">
+                    <span class="badge-urgent px-4 py-2 rounded-full text-sm font-medium">
                         <i class="fas fa-fire mr-1"></i>
                         <span id="countUrgentes">0</span> atividades
                     </span>
@@ -149,7 +152,7 @@
                         <div class="w-6 h-6 rounded-full bg-important-500 mr-4"></div>
                         <h2 class="text-2xl font-bold text-white">IMPORTANTES</h2>
                     </div>
-                    <span class="status-badge bg-important-500 text-white px-4 py-2 rounded-full text-sm font-medium">
+                    <span class="badge-important px-4 py-2 rounded-full text-sm font-medium">
                         <i class="fas fa-star mr-1"></i>
                         <span id="countImportantes">0</span> atividades
                     </span>
@@ -164,7 +167,7 @@
                         <div class="w-6 h-6 rounded-full bg-calm-500 mr-4"></div>
                         <h2 class="text-2xl font-bold text-white">TRANQUILOS</h2>
                     </div>
-                    <span class="status-badge bg-calm-500 text-white px-4 py-2 rounded-full text-sm font-medium">
+                    <span class="badge-calm px-4 py-2 rounded-full text-sm font-medium">
                         <i class="fas fa-leaf mr-1"></i>
                         <span id="countTranquilos">0</span> atividades
                     </span>
@@ -174,7 +177,7 @@
 
             <!-- Mensagem quando não há atividades -->
             <div id="semAtividades" class="hidden text-center py-20">
-                <div class="text-8xl mb-6 animate-float">📚</div>
+                <div class="text-8xl mb-6">📚</div>
                 <h2 class="text-3xl font-bold text-white mb-4">Nenhuma atividade encontrada</h2>
                 <p class="text-gray-400 text-lg">Verifique a planilha Google Sheets ou adicione atividades para começar!</p>
             </div>
@@ -219,62 +222,34 @@
 
         // Função para criar card de atividade
         function criarCardAtividade(atividade) {
-            const statusConfig = {
-                "URGENTE": {
-                    bg: "bg-urgent-50",
-                    border: "border-urgent-500",
-                    badge: "bg-urgent-500",
-                    icon: "fas fa-fire",
-                    text: "text-urgent-600"
-                },
-                "IMPORTANTE": {
-                    bg: "bg-important-50",
-                    border: "border-important-500",
-                    badge: "bg-important-500",
-                    icon: "fas fa-star",
-                    text: "text-important-600"
-                },
-                "TRANQUILO": {
-                    bg: "bg-calm-50",
-                    border: "border-calm-500",
-                    badge: "bg-calm-500",
-                    icon: "fas fa-leaf",
-                    text: "text-calm-600"
-                }
-            };
-
-            const config = statusConfig[atividade.status];
+            const statusClass = `card-${atividade.status.toLowerCase()}`;
+            const badgeClass = `badge-${atividade.status.toLowerCase()}`;
+            const textColorClass = `text-${atividade.status.toLowerCase()}`;
             
             return `
-                <div class="gradient-border">
-                    <div class="glass-card ${config.bg} ${config.border} border-l-4">
-                        <div class="relative">
-                            <!-- Badge de dias restantes -->
-                            <div class="absolute top-3 right-3">
-                                <span class="status-badge ${config.badge} text-white px-3 py-1 rounded-full text-xs font-bold">
-                                    <i class="fas fa-clock mr-1"></i>
-                                    ${atividade.diasRestantes}d
-                                </span>
-                            </div>
-                            
-                            <div class="p-6">
-                                <div class="flex items-start justify-between mb-4">
-                                    <div class="flex items-center">
-                                        <div class="text-3xl mr-4">📘</div>
-                                        <div>
-                                            <h3 class="font-bold text-white text-lg mb-1">${atividade.titulo}</h3>
-                                            <p class="font-semibold ${config.text}">${atividade.disciplina}</p>
-                                        </div>
-                                    </div>
-                                </div>
+                <div class="card ${statusClass} rounded-lg p-6">
+                    <div class="relative">
+                        <!-- Badge de dias restantes -->
+                        <div class="absolute top-3 right-3">
+                            <span class="${badgeClass} px-3 py-1 rounded-full text-xs font-bold">
+                                <i class="fas fa-clock mr-1"></i>
+                                ${atividade.diasRestantes}d
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="text-3xl">📘</div>
+                            <div class="flex-1">
+                                <h3 class="text-gray-light text-lg font-medium mb-2">${atividade.titulo}</h3>
+                                <p class="text-white font-semibold mb-4">${atividade.disciplina}</p>
                                 
                                 <div class="flex items-center justify-between text-sm">
-                                    <div class="flex items-center text-gray-400">
+                                    <div class="flex items-center text-gray-light">
                                         <i class="fas fa-calendar-alt mr-2"></i>
                                         <span>${formatarData(atividade.dataEntrega)}</span>
                                     </div>
-                                    <div class="flex items-center ${config.text}">
-                                        <i class="${config.icon} mr-2"></i>
+                                    <div class="flex items-center ${textColorClass}">
+                                        <i class="fas ${atividade.status === 'URGENTE' ? 'fa-fire' : atividade.status === 'IMPORTANTE' ? 'fa-star' : 'fa-leaf'} mr-2"></i>
                                         <span class="font-medium">${atividade.status}</span>
                                     </div>
                                 </div>
