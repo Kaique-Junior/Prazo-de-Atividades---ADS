@@ -17,64 +17,69 @@ interface AtividadeComDias extends Atividade {
 const Index = () => {
   const [atividades, setAtividades] = useState<AtividadeComDias[]>([]);
   const [dataAtual, setDataAtual] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    // Dados de exemplo
-    const atividadesData: Atividade[] = [
-      {
-        titulo: "Trabalho de Conclusão de Curso",
-        disciplina: "Engenharia de Software",
-        dataEntrega: "2024-12-25"
-      },
-      {
-        titulo: "Projeto de Banco de Dados",
-        disciplina: "Banco de Dados",
-        dataEntrega: "2024-12-20"
-      },
-      {
-        titulo: "Apresentação de Pesquisa",
-        disciplina: "Inteligência Artificial",
-        dataEntrega: "2024-12-18"
-      },
-      {
-        titulo: "Prova Final",
-        disciplina: "Algoritmos e Estruturas de Dados",
-        dataEntrega: "2024-12-22"
-      },
-      {
-        titulo: "Relatório de Estágio",
-        disciplina: "Engenharia de Software",
-        dataEntrega: "2024-12-30"
-      },
-      {
-        titulo: "Monografia",
-        disciplina: "Redes de Computadores",
-        dataEntrega: "2024-12-28"
+    const fetchAtividades = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6-29uYKdWPh1KcQn6SM36wU5a44JpxTW7BXwJxO9HSYhDHxEq1QDtRdXdOEGbOz55AVznV_bjGAMF/pub?gid=404939283&single=true&output=csv");
+        
+        if (!response.ok) {
+          throw new Error("Erro ao buscar dados da planilha");
+        }
+        
+        const csvText = await response.text();
+        const linhas = csvText.split('\n').filter(linha => linha.trim());
+        
+        // Pular cabeçalho e processar dados
+        const atividadesData: Atividade[] = [];
+        
+        for (let i = 1; i < linhas.length; i++) {
+          const colunas = linhas[i].split(',');
+          if (colunas.length >= 3) {
+            atividadesData.push({
+              titulo: colunas[0]?.trim() || '',
+              disciplina: colunas[1]?.trim() || '',
+              dataEntrega: colunas[2]?.trim() || ''
+            });
+          }
+        }
+
+        // Calcular dias restantes e categorizar
+        const atividadesComDias = atividadesData.map(atividade => {
+          const dataEntrega = new Date(atividade.dataEntrega);
+          const hoje = new Date();
+          const diffTime = dataEntrega.getTime() - hoje.getTime();
+          const diasRestantes = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+          let status: "URGENTE" | "IMPORTANTE" | "TRANQUILO" = "TRANQUILO";
+          if (diasRestantes <= 2) {
+            status = "URGENTE";
+          } else if (diasRestantes <= 5) {
+            status = "IMPORTANTE";
+          }
+
+          return {
+            ...atividade,
+            diasRestantes,
+            status
+          };
+        });
+
+        setAtividades(atividadesComDias);
+        setError("");
+      } catch (err) {
+        console.error("Erro ao buscar atividades:", err);
+        setError("Não foi possível carregar as atividades. Verifique a conexão e tente novamente.");
+        setAtividades([]);
+      } finally {
+        setLoading(false);
       }
-    ];
+    };
 
-    // Calcular dias restantes e categorizar
-    const atividadesComDias = atividadesData.map(atividade => {
-      const dataEntrega = new Date(atividade.dataEntrega);
-      const hoje = new Date();
-      const diffTime = dataEntrega.getTime() - hoje.getTime();
-      const diasRestantes = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      let status: "URGENTE" | "IMPORTANTE" | "TRANQUILO" = "TRANQUILO";
-      if (diasRestantes <= 2) {
-        status = "URGENTE";
-      } else if (diasRestantes <= 5) {
-        status = "IMPORTANTE";
-      }
-
-      return {
-        ...atividade,
-        diasRestantes,
-        status
-      };
-    });
-
-    setAtividades(atividadesComDias);
+    fetchAtividades();
     
     // Formatar data atual
     const hoje = new Date();
@@ -110,6 +115,35 @@ const Index = () => {
       default: return status;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-400">Carregando atividades...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-gray-100 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="text-6xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-semibold text-white mb-2">Erro ao carregar</h2>
+          <p className="text-gray-400 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
@@ -251,7 +285,7 @@ const Index = () => {
           <div className="text-center py-12">
             <div className="text-6xl mb-4">📚</div>
             <h2 className="text-2xl font-semibold text-white mb-2">Nenhuma atividade encontrada</h2>
-            <p className="text-gray-400">Adicione suas atividades para começar a organizar seus prazos!</p>
+            <p className="text-gray-400">Verifique a planilha Google Sheets ou adicione atividades para começar!</p>
           </div>
         )}
 
