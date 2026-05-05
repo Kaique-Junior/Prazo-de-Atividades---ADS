@@ -4,74 +4,123 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel de Prazos Acadêmicos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
                     colors: {
-                        background: '#111827',
-                        foreground: '#f3f4f6',
-                        card: '#1f2937',
-                        'card-foreground': '#f3f4f6',
-                        border: '#374151',
-                        input: '#374151',
-                        ring: '#6366f1',
-                        primary: {
-                            DEFAULT: '#6366f1',
-                            foreground: '#ffffff'
+                        glass: {
+                            50: 'rgba(255, 255, 255, 0.05)',
+                            100: 'rgba(255, 255, 255, 0.1)',
+                            200: 'rgba(255, 255, 255, 0.15)',
+                            300: 'rgba(255, 255, 255, 0.2)',
                         },
-                        secondary: {
-                            DEFAULT: '#4b5563',
-                            foreground: '#f3f4f6'
+                        urgent: {
+                            50: 'rgba(239, 68, 68, 0.1)',
+                            100: 'rgba(239, 68, 68, 0.2)',
+                            500: 'rgba(239, 68, 68, 0.8)',
+                            600: 'rgba(220, 38, 38, 0.9)',
                         },
-                        destructive: {
-                            DEFAULT: '#ef4444',
-                            foreground: '#ffffff'
+                        important: {
+                            50: 'rgba(245, 158, 11, 0.1)',
+                            100: 'rgba(245, 158, 11, 0.2)',
+                            500: 'rgba(245, 158, 11, 0.8)',
+                            600: 'rgba(217, 119, 6, 0.9)',
                         },
-                        muted: {
-                            DEFAULT: '#4b5563',
-                            foreground: '#9ca3af'
+                        calm: {
+                            50: 'rgba(34, 197, 94, 0.1)',
+                            100: 'rgba(34, 197, 94, 0.2)',
+                            500: 'rgba(34, 197, 94, 0.8)',
+                            600: 'rgba(22, 163, 74, 0.9)',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
                         },
-                        accent: {
-                            DEFAULT: '#4b5563',
-                            foreground: '#f3f4f6'
-                        },
-                        popover: {
-                            DEFAULT: '#1f2937',
-                            foreground: '#f3f4f6'
+                        glow: {
+                            'from': { boxShadow: '0 0 20px rgba(99, 102, 241, 0.3)' },
+                            'to': { boxShadow: '0 0 30px rgba(99, 102, 241, 0.6)' },
                         }
                     }
                 }
             }
         }
     </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .status-badge {
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .gradient-border {
+            background: linear-gradient(45deg, #6366f1, #8b5cf6, #06b6d4);
+            padding: 1px;
+            border-radius: 12px;
+        }
+        
+        .gradient-border .glass-card {
+            border-radius: 11px;
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-gray-100">
-    <div class="container mx-auto px-4 py-8">
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 text-gray-100">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
         <!-- Cabeçalho -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-white mb-2">📌 PAINEL DE PRAZOS</h1>
-            <p class="text-gray-400" id="dataAtual">Carregando...</p>
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent mb-4">
+                📌 Painel de Prazos
+            </h1>
+            <p class="text-gray-400 text-sm" id="dataAtual">Carregando...</p>
         </div>
 
         <!-- Loading -->
         <div id="loading" class="min-h-screen flex items-center justify-center">
             <div class="text-center">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                <p class="text-gray-400">Carregando atividades...</p>
+                <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+                <p class="text-gray-400 text-lg">Carregando atividades...</p>
             </div>
         </div>
 
         <!-- Erro -->
         <div id="error" class="hidden min-h-screen flex items-center justify-center">
             <div class="text-center max-w-md">
-                <div class="text-6xl mb-4">⚠️</div>
-                <h2 class="text-2xl font-semibold text-white mb-2">Erro ao carregar</h2>
-                <p class="text-gray-400 mb-4" id="errorMessage">Não foi possível carregar as atividades.</p>
-                <button onclick="location.reload()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors">
-                    Tentar novamente
+                <div class="text-8xl mb-6 animate-pulse">⚠️</div>
+                <h2 class="text-3xl font-semibold text-white mb-3">Erro ao carregar</h2>
+                <p class="text-gray-400 mb-6" id="errorMessage">Não foi possível carregar as atividades.</p>
+                <button onclick="location.reload()" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-all transform hover:scale-105">
+                    <i class="fas fa-redo mr-2"></i>Tentar novamente
                 </button>
             </div>
         </div>
@@ -79,45 +128,61 @@
         <!-- Conteúdo Principal -->
         <div id="conteudo" class="hidden">
             <!-- Seção URGENTES -->
-            <div id="secaoUrgentes" class="mb-8">
-                <div class="flex items-center mb-4">
-                    <div class="w-4 h-4 rounded-full bg-red-500 mr-3"></div>
-                    <h2 class="text-xl font-semibold text-white">URGENTES</h2>
-                    <span class="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full" id="countUrgentes">0</span>
+            <div id="secaoUrgentes" class="mb-12">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <div class="w-6 h-6 rounded-full bg-urgent-500 mr-4 animate-pulse"></div>
+                        <h2 class="text-2xl font-bold text-white">URGENTES</h2>
+                    </div>
+                    <span class="status-badge bg-urgent-500 text-white px-4 py-2 rounded-full text-sm font-medium">
+                        <i class="fas fa-fire mr-1"></i>
+                        <span id="countUrgentes">0</span> atividades
+                    </span>
                 </div>
-                <div id="listaUrgentes" class="space-y-4"></div>
+                <div id="listaUrgentes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
 
             <!-- Seção IMPORTANTES -->
-            <div id="secaoImportantes" class="mb-8">
-                <div class="flex items-center mb-4">
-                    <div class="w-4 h-4 rounded-full bg-yellow-500 mr-3"></div>
-                    <h2 class="text-xl font-semibold text-white">IMPORTANTES</h2>
-                    <span class="ml-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded-full" id="countImportantes">0</span>
+            <div id="secaoImportantes" class="mb-12">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <div class="w-6 h-6 rounded-full bg-important-500 mr-4"></div>
+                        <h2 class="text-2xl font-bold text-white">IMPORTANTES</h2>
+                    </div>
+                    <span class="status-badge bg-important-500 text-white px-4 py-2 rounded-full text-sm font-medium">
+                        <i class="fas fa-star mr-1"></i>
+                        <span id="countImportantes">0</span> atividades
+                    </span>
                 </div>
-                <div id="listaImportantes" class="space-y-4"></div>
+                <div id="listaImportantes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
 
             <!-- Seção TRANQUILOS -->
-            <div id="secaoTranquilos" class="mb-8">
-                <div class="flex items-center mb-4">
-                    <div class="w-4 h-4 rounded-full bg-green-500 mr-3"></div>
-                    <h2 class="text-xl font-semibold text-white">TRANQUILOS</h2>
-                    <span class="ml-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full" id="countTranquilos">0</span>
+            <div id="secaoTranquilos" class="mb-12">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <div class="w-6 h-6 rounded-full bg-calm-500 mr-4"></div>
+                        <h2 class="text-2xl font-bold text-white">TRANQUILOS</h2>
+                    </div>
+                    <span class="status-badge bg-calm-500 text-white px-4 py-2 rounded-full text-sm font-medium">
+                        <i class="fas fa-leaf mr-1"></i>
+                        <span id="countTranquilos">0</span> atividades
+                    </span>
                 </div>
-                <div id="listaTranquilos" class="space-y-4"></div>
+                <div id="listaTranquilos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
 
             <!-- Mensagem quando não há atividades -->
-            <div id="semAtividades" class="hidden text-center py-12">
-                <div class="text-6xl mb-4">📚</div>
-                <h2 class="text-2xl font-semibold text-white mb-2">Nenhuma atividade encontrada</h2>
-                <p class="text-gray-400">Verifique a planilha Google Sheets ou adicione atividades para começar!</p>
+            <div id="semAtividades" class="hidden text-center py-20">
+                <div class="text-8xl mb-6 animate-float">📚</div>
+                <h2 class="text-3xl font-bold text-white mb-4">Nenhuma atividade encontrada</h2>
+                <p class="text-gray-400 text-lg">Verifique a planilha Google Sheets ou adicione atividades para começar!</p>
             </div>
 
             <!-- Made with Dyad -->
-            <div class="p-4 text-center">
-                <a href="https://www.dyad.sh/" target="_blank" rel="noopener noreferrer" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+            <div class="text-center mt-16">
+                <a href="https://www.dyad.sh/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-code mr-2"></i>
                     Made with Dyad
                 </a>
             </div>
@@ -154,30 +219,64 @@
 
         // Função para criar card de atividade
         function criarCardAtividade(atividade) {
-            const statusColor = {
-                "URGENTE": "border-red-500 text-red-400",
-                "IMPORTANTE": "border-yellow-500 text-yellow-400",
-                "TRANQUILO": "border-green-500 text-green-400"
+            const statusConfig = {
+                "URGENTE": {
+                    bg: "bg-urgent-50",
+                    border: "border-urgent-500",
+                    badge: "bg-urgent-500",
+                    icon: "fas fa-fire",
+                    text: "text-urgent-600"
+                },
+                "IMPORTANTE": {
+                    bg: "bg-important-50",
+                    border: "border-important-500",
+                    badge: "bg-important-500",
+                    icon: "fas fa-star",
+                    text: "text-important-600"
+                },
+                "TRANQUILO": {
+                    bg: "bg-calm-50",
+                    border: "border-calm-500",
+                    badge: "bg-calm-500",
+                    icon: "fas fa-leaf",
+                    text: "text-calm-600"
+                }
             };
 
+            const config = statusConfig[atividade.status];
+            
             return `
-                <div class="bg-gray-800 rounded-lg p-4 border-l-4 ${statusColor[atividade.status]} hover:bg-gray-750 transition-colors">
-                    <div class="flex items-start space-x-3">
-                        <div class="text-2xl">📘</div>
-                        <div class="flex-1">
-                            <h3 class="font-semibold text-white text-lg">${atividade.titulo}</h3>
-                            <div class="flex items-center space-x-4 mt-2 text-sm">
-                                <div class="flex items-center text-gray-300">
-                                    <span class="mr-1">📚</span>
-                                    <span>${atividade.disciplina}</span>
+                <div class="gradient-border">
+                    <div class="glass-card ${config.bg} ${config.border} border-l-4">
+                        <div class="relative">
+                            <!-- Badge de dias restantes -->
+                            <div class="absolute top-3 right-3">
+                                <span class="status-badge ${config.badge} text-white px-3 py-1 rounded-full text-xs font-bold">
+                                    <i class="fas fa-clock mr-1"></i>
+                                    ${atividade.diasRestantes}d
+                                </span>
+                            </div>
+                            
+                            <div class="p-6">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="flex items-center">
+                                        <div class="text-3xl mr-4">📘</div>
+                                        <div>
+                                            <h3 class="font-bold text-white text-lg mb-1">${atividade.titulo}</h3>
+                                            <p class="font-semibold ${config.text}">${atividade.disciplina}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="flex items-center text-gray-300">
-                                    <span class="mr-1">📅</span>
-                                    <span>${formatarData(atividade.dataEntrega)}</span>
-                                </div>
-                                <div class="flex items-center ${statusColor[atividade.status]} font-medium">
-                                    <span class="mr-1">⏳</span>
-                                    <span>${atividade.diasRestantes} dias restantes</span>
+                                
+                                <div class="flex items-center justify-between text-sm">
+                                    <div class="flex items-center text-gray-400">
+                                        <i class="fas fa-calendar-alt mr-2"></i>
+                                        <span>${formatarData(atividade.dataEntrega)}</span>
+                                    </div>
+                                    <div class="flex items-center ${config.text}">
+                                        <i class="${config.icon} mr-2"></i>
+                                        <span class="font-medium">${atividade.status}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -288,7 +387,7 @@
                 month: '2-digit',
                 year: 'numeric'
             });
-            document.getElementById('dataAtual').textContent = `Atualizado em: ${dataFormatada}`;
+            document.getElementById('dataAtual').textContent = `Última atualização: ${dataFormatada}`;
         }
 
         // Inicializar
